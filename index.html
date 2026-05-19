@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Children Duty Roster</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Teko:wght@400;600;700&family=Barlow:wght@400;500;600&display=swap');
+
+  :root {
+    --green-dark: #1a6b1a;
+    --green-mid: #2d8a2d;
+    --green-light: #90EE90;
+    --green-pale: #c8f0c8;
+    --yellow: #FFD700;
+    --orange: #FF8C00;
+    --red-light: #ffb3b3;
+    --blue-light: #b3d9ff;
+    --purple: #9b59b6;
+    --white: #ffffff;
+    --border: #555;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #1a1a2e;
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  h1 {
+    font-family: 'Teko', sans-serif;
+    color: var(--yellow);
+    font-size: 2.2rem;
+    letter-spacing: 4px;
+    margin-bottom: 18px;
+    text-shadow: 0 0 20px rgba(255,215,0,0.4);
+  }
+
+  .controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .controls label {
+    color: var(--green-light);
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .controls select {
+    background: #0f3d0f;
+    color: var(--yellow);
+    border: 2px solid var(--green-mid);
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 1rem;
+    font-family: 'Barlow', sans-serif;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .controls input[type="date"] {
+    background: #0f3d0f;
+    color: var(--yellow);
+    border: 2px solid var(--green-mid);
+    border-radius: 6px;
+    padding: 7px 12px;
+    font-size: 1rem;
+    font-family: 'Barlow', sans-serif;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .controls button {
+    background: var(--green-dark);
+    color: var(--yellow);
+    border: 2px solid var(--yellow);
+    border-radius: 6px;
+    padding: 7px 18px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Barlow', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .controls button:hover { background: var(--green-mid); }
+
+  /* ===== MAIN ROSTER CARD ===== */
+  .roster-card {
+    background: #e8f5e8;
+    border: 3px solid var(--green-dark);
+    border-radius: 10px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 860px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+
+  .roster-body {
+    display: flex;
+    gap: 0;
+  }
+
+  /* ===== LEFT: CHILDREN TABLE ===== */
+  .left-section {
+    flex: 1.1;
+    border-right: 3px solid var(--green-dark);
+  }
+
+  .section-header {
+    background: var(--green-dark);
+    color: var(--white);
+    text-align: center;
+    font-family: 'Teko', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    padding: 6px 0;
+    border-bottom: 2px solid #333;
+  }
+
+  .children-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .children-table th {
+    background: #b8e8b8;
+    color: #1a1a1a;
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 5px 8px;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .children-table td {
+    padding: 4px 8px;
+    border: 1px solid #aaa;
+    font-size: 0.87rem;
+    text-align: center;
+  }
+
+  .row-morning { background: var(--green-pale); }
+  .row-evening { background: var(--red-light); }
+  .row-zero { background: #e0e0e0; color: #888; }
+  .row-total-label { background: var(--blue-light); font-weight: 700; }
+  .row-grand { background: var(--yellow); font-weight: 700; }
+
+  /* ===== RIGHT: OFF DAY + LEAVE + TRAIL ===== */
+  .right-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .offday-header {
+    background: var(--yellow);
+    color: #222;
+    text-align: center;
+    font-family: 'Teko', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    padding: 6px 0;
+    border-bottom: 2px solid #333;
+  }
+
+  .right-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .right-table th {
+    background: #b8e8b8;
+    color: #1a1a1a;
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 5px 8px;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .right-table td {
+    padding: 5px 10px;
+    border: 1px solid #aaa;
+    font-size: 0.87rem;
+  }
+
+  .offday-row td { background: var(--green-pale); }
+  .offday-names { color: #c0392b; font-weight: 600; }
+
+  .leave-header-row td {
+    background: var(--green-mid);
+    color: white;
+    font-weight: 700;
+    text-align: center;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+  }
+
+  .leave-row { background: #fff9e6; }
+  .leave-row td:first-child { font-weight: 600; }
+
+  .trail-header-row td {
+    background: var(--orange);
+    color: white;
+    font-weight: 700;
+    text-align: center;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+  }
+
+  .trail-row { background: #f0f8ff; }
+  .trail-row td { padding: 10px; font-weight: 600; }
+
+  .date-cell {
+    background: var(--green-mid);
+    color: var(--yellow);
+    text-align: center;
+    font-family: 'Teko', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    padding: 14px;
+    border-top: 2px solid var(--green-dark);
+  }
+
+  /* ===== EDIT MODAL ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: #0f3d0f;
+    border: 2px solid var(--yellow);
+    border-radius: 12px;
+    padding: 24px 28px;
+    width: 95%;
+    max-width: 540px;
+    color: var(--white);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal h2 {
+    font-family: 'Teko', sans-serif;
+    color: var(--yellow);
+    font-size: 1.6rem;
+    margin-bottom: 16px;
+    letter-spacing: 2px;
+  }
+
+  .modal label {
+    display: block;
+    color: var(--green-light);
+    margin-top: 10px;
+    margin-bottom: 3px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .modal input, .modal textarea, .modal select {
+    width: 100%;
+    background: #1a5c1a;
+    color: #fff;
+    border: 1px solid var(--green-mid);
+    border-radius: 5px;
+    padding: 7px 10px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+  }
+
+  .modal textarea { resize: vertical; min-height: 60px; }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+    justify-content: flex-end;
+  }
+
+  .btn-save {
+    background: var(--green-dark);
+    color: var(--yellow);
+    border: 2px solid var(--yellow);
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Barlow', sans-serif;
+  }
+  .btn-cancel {
+    background: #6b1a1a;
+    color: #fff;
+    border: 2px solid #c0392b;
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Barlow', sans-serif;
+  }
+
+  .name-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .chip {
+    background: #1a5c1a;
+    border: 1px solid var(--green-mid);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    color: #cfc;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .chip.selected { background: var(--green-dark); border-color: var(--yellow); color: var(--yellow); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<h1>📋 CHILDREN DUTY ROSTER</h1>
+
+<div class="controls">
+  <label>Day:</label>
+  <select id="daySelect">
+    <option value="Saturday">Saturday</option>
+    <option value="Sunday">Sunday</option>
+    <option value="Monday">Monday</option>
+    <option value="Tuesday" selected>Tuesday</option>
+    <option value="Wednesday">Wednesday</option>
+    <option value="Thursday">Thursday</option>
+    <option value="Friday">Friday</option>
+  </select>
+
+  <label>Date:</label>
+  <input type="date" id="dateInput">
+
+  <button onclick="openEditModal()">✏️ Edit</button>
+</div>
+
+<div class="roster-card" id="rosterCard">
+  <!-- rendered by JS -->
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2>✏️ Edit Day Data</h2>
+
+    <label>Select Day to Edit:</label>
+    <select id="editDay">
+      <option value="Saturday">Saturday</option>
+      <option value="Sunday">Sunday</option>
+      <option value="Monday">Monday</option>
+      <option value="Tuesday">Tuesday</option>
+      <option value="Wednesday">Wednesday</option>
+      <option value="Thursday">Thursday</option>
+      <option value="Friday">Friday</option>
+    </select>
+
+    <label>Morning Shift (select names):</label>
+    <div class="name-chips" id="morningChips"></div>
+
+    <label>Evening Shift (select names):</label>
+    <div class="name-chips" id="eveningChips"></div>
+
+    <label>Off Day Children (comma separated):</label>
+    <input type="text" id="editOffday" placeholder="e.g. Yeasmin,Sumaya,Jiniya">
+
+    <label>Leave Data (one per line: Name L18,E19 ...):</label>
+    <textarea id="editLeave" placeholder="Arpita L18,E19,M22&#10;ratan L18,L20(bh)"></textarea>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="btn-save" onclick="saveEdit()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== ALL CHILDREN =====
+const ALL_CHILDREN = [
+  "Onti","Rida","Runu","Anika","Hasib","Saied","Suikraching",
+  "Juie","Afrain","Nafisa","Ashik","Abrar","Mou","Arpita","Anila","Ratan","Alvee",
+  "Yeasmin","Sumaya","Jiniya","Arifa","Ashiq"
+];
+
+// ===== DEFAULT DATA (from images) =====
+let rosterData = {
+  Saturday: {
+    morning: ["Juie","Yeasmin","Rida","Anila","Sumaya","Afrain","Alvee"],
+    evening: ["Runu","Mou","Onti","Jiniya","Nafisa","Arifa","Saied","Ashik","Suikraching"],
+    offday: ["Anika","Arpita","Raton"],
+    leave: {}
+  },
+  Sunday: {
+    morning: ["Yeasmin","Onti","Nafisa","Saied","Anika","Ashik","Suikraching"],
+    evening: ["Juie","Arifa","Afrain","Runu","Arpita","Jiniya","Sumaya","Alvee","Ratan"],
+    offday: ["Mou", "Hasib","Anila","Rida"],
+    leave: {}
+  },
+  Monday: {
+    morning: ["Mou","Juie","Sumaya","Runu","Ratan","Alvee","Afrain"],
+    evening: ["Yeasmin","Jiniya","Suikraching","Onti","Ashik","Arpita","Hasib","Anika","Anila","Rida"],
+    offday: ["Saied","Arifa","Nafisa"],
+    leave: {}
+  },
+  Tuesday: {
+    morning: ["Onti","Rida","Runu","Anika","Hasib","Saied","Suikraching"],
+    evening: ["Juie","Afrain","Nafisa","Ashik","Mou","Arpita","Anila","Ratan","Alvee"],
+    offday: ["Yeasmin","Sumaya","Jiniya"],
+    leave: {}
+  },
+  Wednesday: {
+    morning: ["Juie","Yeasmin","Hasib","Nafisa","Anila","Sumaya","Alvee"],
+    evening: ["Mou","Saied","Arifa","Rida","Jiniya","Runu","Anika","Arpita","Suikraching","Ratan"],
+    offday: ["Ashik","Afrain","Onti"],
+    leave: {}
+  },
+  Thursday: {
+    morning: ["Mou","Hasib","Rida","Arpita","Yeasmin","Anika","Saied"],
+    evening: ["Onti","Sumaya","Runu","Nafisa","Anila","Afrain","Jiniya","Arifa","Ashiq","Ratan"],
+    offday: ["Juie","Suikraching","Alvee"],
+    leave: {}
+  },
+  Friday: {
+    morning: ["Onti","Mou","Afrain","Anila","Nafisa","Suikraching","Ratan"],
+    evening: ["Sumaya","Jiniya","Saied","Juie","Arifa","Yeasmin","Arpita","Ashik","Rida","Hasib","Anika","Alvee"],
+    offday: ["Runu"],
+    leave: {}
+  }
+};
+
+// ===== DATE =====
+function getTodayDate() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function formatDisplayDate(dateStr, dayName) {
+  if (!dateStr) return dayName;
+  const d = new Date(dateStr + 'T00:00:00');
+  const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  return d.toLocaleDateString('en-US', opts);
+}
+
+// ===== RENDER =====
+function render() {
+  const day = document.getElementById('daySelect').value;
+  const dateVal = document.getElementById('dateInput').value;
+  const data = rosterData[day];
+
+  const morningSet = new Set(data.morning);
+  const eveningSet = new Set(data.evening);
+  const offdaySet = new Set(data.offday);
+
+  // Build children rows
+  let morningRows = '';
+  let eveningRows = '';
+  let morningCount = 0, eveningCount = 0;
+
+  // Morning children
+  data.morning.forEach(name => {
+    morningRows += `<tr class="row-morning">
+      <td>${name}</td>
+      <td>1</td>
+      <td></td>
+    </tr>`;
+    morningCount++;
+  });
+
+  // Evening children (not in morning)
+  data.evening.forEach(name => {
+    const inMorning = morningSet.has(name);
+    if (!inMorning) {
+      eveningRows += `<tr class="row-evening">
+        <td>${name}</td>
+        <td></td>
+        <td>1</td>
+      </tr>`;
+      eveningCount++;
+    } else {
+      // Both shifts
+    }
+  });
+
+  // Both shift
+  let bothRows = '';
+  data.morning.forEach(name => {
+    if (eveningSet.has(name)) {
+      bothRows += `<tr style="background:#ffe0b2;">
+        <td>${name}</td>
+        <td>1</td>
+        <td>1</td>
+      </tr>`;
+    }
+  });
+
+  const grandTotal = morningCount + eveningCount + data.morning.filter(n => eveningSet.has(n)).length;
+
+  // Leave rows
+  let leaveRows = '';
+  const leaveEntries = Object.entries(data.leave);
+  if (leaveEntries.length === 0) {
+    leaveRows = `<tr class="leave-row"><td colspan="2" style="text-align:center;color:#aaa;font-style:italic;">No leave data</td></tr>`;
+  } else {
+    leaveEntries.forEach(([name, info]) => {
+      leaveRows += `<tr class="leave-row"><td>${name}</td><td>${info}</td></tr>`;
+    });
+  }
+
+  // Offday
+  const offdayNames = data.offday.length > 0 ? data.offday.join(', ') : '—';
+
+  const dateDisplay = dateVal ? formatDisplayDate(dateVal, day) : day;
+
+  document.getElementById('rosterCard').innerHTML = `
+    <div class="roster-body">
+      <!-- LEFT -->
+      <div class="left-section">
+        <div class="section-header">CHILDREN</div>
+        <table class="children-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Morning</th>
+              <th>Evening</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${morningRows}
+            ${bothRows}
+            ${eveningRows}
+            <tr class="row-zero"><td>0</td><td></td><td></td></tr>
+            <tr class="row-total-label">
+              <td>Total</td>
+              <td>${morningCount}</td>
+              <td>${eveningCount}</td>
+            </tr>
+            <tr class="row-grand">
+              <td colspan="2" style="text-align:right;">TOTAL=</td>
+              <td>${morningCount + eveningCount}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="right-section">
+        <div class="offday-header">OFFDAY</div>
+        <table class="right-table">
+          <thead>
+            <tr><th>Dep</th><th>Name</th></tr>
+          </thead>
+          <tbody>
+            <tr class="offday-row">
+              <td>CHILDREN</td>
+              <td class="offday-names">${offdayNames}</td>
+            </tr>
+            <tr><td colspan="2" style="background:#e8f5e8;height:6px;"></td></tr>
+            <tr class="leave-header-row"><td colspan="2">Leave Data</td></tr>
+            ${leaveRows}
+            <tr><td colspan="2" style="background:#e8f5e8;height:6px;"></td></tr>
+            <tr class="trail-header-row"><td colspan="2">Trail</td></tr>
+            <tr class="trail-row"><td>Morning</td><td></td></tr>
+            <tr class="trail-row"><td>Evening</td><td></td></tr>
+          </tbody>
+        </table>
+        <div class="date-cell">${dateDisplay}</div>
+      </div>
+    </div>
+  `;
+}
+
+// ===== EDIT MODAL =====
+function openEditModal() {
+  const day = document.getElementById('daySelect').value;
+  document.getElementById('editDay').value = day;
+  buildChips(day);
+  const data = rosterData[day];
+  document.getElementById('editOffday').value = data.offday.join(',');
+  document.getElementById('editLeave').value = Object.entries(data.leave).map(([k,v])=>`${k} ${v}`).join('\n');
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function buildChips(day) {
+  const data = rosterData[day];
+  const morningDiv = document.getElementById('morningChips');
+  const eveningDiv = document.getElementById('eveningChips');
+
+  morningDiv.innerHTML = '';
+  eveningDiv.innerHTML = '';
+
+  ALL_CHILDREN.forEach(name => {
+    const mChip = document.createElement('span');
+    mChip.className = 'chip' + (data.morning.includes(name) ? ' selected' : '');
+    mChip.textContent = name;
+    mChip.onclick = () => mChip.classList.toggle('selected');
+    morningDiv.appendChild(mChip);
+
+    const eChip = document.createElement('span');
+    eChip.className = 'chip' + (data.evening.includes(name) ? ' selected' : '');
+    eChip.textContent = name;
+    eChip.onclick = () => eChip.classList.toggle('selected');
+    eveningDiv.appendChild(eChip);
+  });
+}
+
+function saveEdit() {
+  const day = document.getElementById('editDay').value;
+
+  const morning = [...document.querySelectorAll('#morningChips .chip.selected')].map(c => c.textContent);
+  const evening = [...document.querySelectorAll('#eveningChips .chip.selected')].map(c => c.textContent);
+
+  const offdayRaw = document.getElementById('editOffday').value;
+  const offday = offdayRaw.split(',').map(s=>s.trim()).filter(Boolean);
+
+  const leaveRaw = document.getElementById('editLeave').value;
+  const leave = {};
+  leaveRaw.split('\n').forEach(line => {
+    const parts = line.trim().split(' ');
+    if (parts.length >= 2) {
+      const name = parts[0];
+      const info = parts.slice(1).join(' ');
+      leave[name] = info;
+    }
+  });
+
+  rosterData[day] = { morning, evening, offday, leave };
+
+  // Switch to edited day
+  document.getElementById('daySelect').value = day;
+  closeEditModal();
+  render();
+}
+
+// ===== INIT =====
+document.getElementById('dateInput').value = getTodayDate();
+document.getElementById('daySelect').addEventListener('change', render);
+document.getElementById('dateInput').addEventListener('change', render);
+document.getElementById('editDay').addEventListener('change', function() {
+  buildChips(this.value);
+  const data = rosterData[this.value];
+  document.getElementById('editOffday').value = data.offday.join(',');
+  document.getElementById('editLeave').value = Object.entries(data.leave).map(([k,v])=>`${k} ${v}`).join('\n');
+});
+
+render();
+</script>
+</body>
+</html>
