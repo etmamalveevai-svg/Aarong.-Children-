@@ -360,10 +360,8 @@
 </div>
 
 <div class="roster-card" id="rosterCard">
-  <!-- rendered by JS -->
-</div>
+  </div>
 
-<!-- EDIT MODAL -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <h2>✏️ Edit Day Data</h2>
@@ -389,7 +387,7 @@
     <input type="text" id="editOffday" placeholder="e.g. Yeasmin,Sumaya,Jiniya">
 
     <label>Leave Data (one per line: Name L18,E19 ...):</label>
-    <textarea id="editLeave" placeholder="Arpita L18,E19,M22&#10;ratan L18,L20(bh)"></textarea>
+    <textarea id="editLeave" placeholder="Arpita L18,E19,M22&#10;Ratan L18,L20(bh)"></textarea>
 
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
@@ -406,12 +404,12 @@ const ALL_CHILDREN = [
   "Yeasmin","Sumaya","Jiniya","Arifa","Ashiq"
 ];
 
-// ===== DEFAULT DATA (from images) =====
+// ===== DEFAULT DATA (Fixed Saturday Offday name typo) =====
 let rosterData = {
   Saturday: {
     morning: ["Juie","Yeasmin","Rida","Anila","Sumaya","Afrain","Alvee"],
     evening: ["Runu","Mou","Onti","Jiniya","Nafisa","Arifa","Saied","Ashik","Suikraching"],
-    offday: ["Anika","Arpita","Raton"],
+    offday: ["Anika","Arpita","Ratan"],
     leave: {}
   },
   Sunday: {
@@ -472,7 +470,6 @@ function render() {
 
   const morningSet = new Set(data.morning);
   const eveningSet = new Set(data.evening);
-  const offdaySet = new Set(data.offday);
 
   // Build children rows
   let morningRows = '';
@@ -499,8 +496,6 @@ function render() {
         <td>1</td>
       </tr>`;
       eveningCount++;
-    } else {
-      // Both shifts
     }
   });
 
@@ -516,8 +511,6 @@ function render() {
     }
   });
 
-  const grandTotal = morningCount + eveningCount + data.morning.filter(n => eveningSet.has(n)).length;
-
   // Leave rows
   let leaveRows = '';
   const leaveEntries = Object.entries(data.leave);
@@ -529,14 +522,12 @@ function render() {
     });
   }
 
-  // Offday
-  const offdayNames = data.offday.length > 0 ? data.offday.join(', ') : '—';
-
+  // Offday (Fixed spacing & rendering)
+  const offdayNames = data.offday && data.offday.length > 0 ? data.offday.join(', ') : '—';
   const dateDisplay = dateVal ? formatDisplayDate(dateVal, day) : day;
 
   document.getElementById('rosterCard').innerHTML = `
     <div class="roster-body">
-      <!-- LEFT -->
       <div class="left-section">
         <div class="section-header">CHILDREN</div>
         <table class="children-table">
@@ -565,7 +556,6 @@ function render() {
         </table>
       </div>
 
-      <!-- RIGHT -->
       <div class="right-section">
         <div class="offday-header">OFFDAY</div>
         <table class="right-table">
@@ -598,7 +588,7 @@ function openEditModal() {
   document.getElementById('editDay').value = day;
   buildChips(day);
   const data = rosterData[day];
-  document.getElementById('editOffday').value = data.offday.join(',');
+  document.getElementById('editOffday').value = data.offday.join(', ');
   document.getElementById('editLeave').value = Object.entries(data.leave).map(([k,v])=>`${k} ${v}`).join('\n');
   document.getElementById('modalOverlay').classList.add('open');
 }
@@ -633,8 +623,8 @@ function buildChips(day) {
 function saveEdit() {
   const day = document.getElementById('editDay').value;
 
-  const morning = [...document.querySelectorAll('#morningChips .chip.selected')].map(c => c.textContent);
-  const evening = [...document.querySelectorAll('#eveningChips .chip.selected')].map(c => c.textContent);
+  const morning = [...document.querySelectorAll('#morningChips .chip.selected')].map(c => c.textContent.trim());
+  const evening = [...document.querySelectorAll('#eveningChips .chip.selected')].map(c => c.textContent.trim());
 
   const offdayRaw = document.getElementById('editOffday').value;
   const offday = offdayRaw.split(',').map(s=>s.trim()).filter(Boolean);
@@ -642,7 +632,7 @@ function saveEdit() {
   const leaveRaw = document.getElementById('editLeave').value;
   const leave = {};
   leaveRaw.split('\n').forEach(line => {
-    const parts = line.trim().split(' ');
+    const parts = line.trim().split(/\s+/);
     if (parts.length >= 2) {
       const name = parts[0];
       const info = parts.slice(1).join(' ');
@@ -665,7 +655,7 @@ document.getElementById('dateInput').addEventListener('change', render);
 document.getElementById('editDay').addEventListener('change', function() {
   buildChips(this.value);
   const data = rosterData[this.value];
-  document.getElementById('editOffday').value = data.offday.join(',');
+  document.getElementById('editOffday').value = data.offday.join(', ');
   document.getElementById('editLeave').value = Object.entries(data.leave).map(([k,v])=>`${k} ${v}`).join('\n');
 });
 
